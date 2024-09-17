@@ -66,5 +66,6 @@ class IntegralValue:
             print (f"Method {Methods[2]}, n = {Intervals[i]} :  {SimIntegralValue} with accuracy : {round(Accuracy,6)} ")
 
 IntegralValue(a,b)
+#Проанализировав результаты, можно сказать что метод Симпсона достигает самую высокую точность
 
 
