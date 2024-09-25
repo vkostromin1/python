@@ -7,65 +7,85 @@ import math
 a = 1
 b = math.e 
 Intervals = [5,10,100]
-Methods = ["MiddlePoint", "Trapetions", "Simpson"]
 
-class IntegralValue:
-    # Значение определённого интеграла
-    def Integrated(integral, x):
+# Значение определённого интеграла
+def Integrated(x):
         return x**2 + 16/x
-    # Функция инициализации свойства объекта integral
-    def __init__(integral, a , b) -> None:
-        integral.MethodsNames = [integral.MiddlePoint , integral.Trapetions, integral.Simpson]
-        integral.FirstValue = a
-        integral.EndValue = b
-        integral.Calculate()
-    # Аналитический метод (1 задание)
-    def Analytic(integral): 
-        return quad(integral.Integrated, integral.FirstValue, integral.EndValue)[0]
-    # Метод средних прямоугольников
-    def MiddlePoint(integral, n): 
-        h2 = 0
-        h = (integral.EndValue - integral.FirstValue)/ n
-        for i in range(0, n-1):
-            h2 = h2 + h * integral.Integrated(integral.FirstValue + h/2 + i * h)
-        return h2
-    # Метод трапеций
-    def Trapetions(integral, n):
-        h = (integral.EndValue - integral.FirstValue)/n 
-        h2 = h*(integral.Integrated(integral.FirstValue) + integral.Integrated(integral.EndValue))/ 2
-        for i in range(1, n -1):
-            h2 = h2 + h * integral.Integrated(integral.FirstValue + i * h)
-        return h2
-    # метод Симпсона
-    def Simpson(integral, n):
-        h = (integral.EndValue-integral.FirstValue)/(2 * n)
-        h1 = 0
-        h2 = 0
-        for i in range(1 , n):
-            x1 = integral.FirstValue + (2*i - 1) * h
-            h1 = h1 + integral.Integrated(x1)
-            x2 = x1 + h 
-            h2 = h2 + integral.Integrated(x2)
-        h3 = h/3*(integral.Integrated(integral.FirstValue) + 4* h1 + 2 * h2 - integral.Integrated(integral.EndValue))
-        return h3
-    # Вычисление численно по методам и определение абсолютных погрешностей (2-3 задание)
-    def Calculate(integral):
-        integral.AnalyticValue = integral.Analytic()
-        print(f"Analitic Method: {round(integral.AnalyticValue, 6)}")
-        for i in range(len(Intervals)):
-            MidIntegralValue = integral.MethodsNames[0](Intervals[i])
-            Accuracy = abs(integral.AnalyticValue - MidIntegralValue)
-            print (f"Method {Methods[0]}, n = {Intervals[i]} :  {MidIntegralValue} with accuracy : {round(Accuracy,6)} ")
-        for i in range(len(Intervals)):
-            TraIntegralValue = integral.MethodsNames[1](Intervals[i])
-            Accuracy = abs(integral.AnalyticValue - TraIntegralValue)
-            print (f"Method {Methods[1]}, n = {Intervals[i]} :  {TraIntegralValue} with accuracy : {round(Accuracy,6)} ")
-        for i in range(len(Intervals)):
-            SimIntegralValue = integral.MethodsNames[2](Intervals[i])
-            Accuracy = abs(integral.AnalyticValue - SimIntegralValue)
-            print (f"Method {Methods[2]}, n = {Intervals[i]} :  {SimIntegralValue} with accuracy : {round(Accuracy,6)} ")
 
-IntegralValue(a,b)
-#Проанализировав результаты, можно сказать что метод Симпсона достигает самую высокую точность
+# Метод средних прямоугольников
+def MiddlePoint(n): # метод средних прямоугольников
+    S = 0
+    h = (b-a)/n
+    for i in range(n):
+        S += h * Integrated(a + h/2 + i * h)
+    return S
 
+# Метод трапеций
+def Trapetions(n): # метод трапеций
+    S = 0
+    h = (b-a)/n
+    for i in range(1, n + 1):
+        S += h * (Integrated(a + (i-1)*h) + Integrated(a + i * h)) / 2
+    return S
 
+# Метод Симпсона
+def Simpson(n): 
+    S1 = 0
+    S2 = 0
+    h = (b-a)/n
+    for i in range(1, n + 1, 2):
+        S1 += Integrated(a + i * h)
+    for i in range(2, n + 1, 2):
+        S2 += Integrated(a + i * h)
+    return (h/3)*(Integrated(a) + 4*S1 + 2*S2 - Integrated(b))
+
+AnalyticValue = quad(Integrated, a, b)[0] # вычисление результата
+print(f"Аналитический метод: {round(AnalyticValue, 6)}")
+print(f"---------------------------------")
+for n in Intervals:
+    mp = MiddlePoint(n)
+    print(f'Результат вычисления методом средних прямоугольников равен {mp} при n = {n}')
+    print(f'Абсолютная погрешность при n = {n} для метода средних прямоугольников: {abs(mp - AnalyticValue)}')
+    print(f'Относительная погрешность при n = {n} для метода средних прямоугольников: {(abs(mp - AnalyticValue) / AnalyticValue) * 100}%') 
+print(f"---------------------------------")
+for n in Intervals:
+    trap = Trapetions(n)
+    print(f'Результат вычисления методом трапеций равен {trap} при n = {n}')
+    print(f'Абсолютная погрешность при n = {n} для метода трапеций: {abs(trap - AnalyticValue)}')
+    print(f'Относительная погрешность при n = {n} для метода средних прямоугольников: {(abs(trap - AnalyticValue) / AnalyticValue) * 100}%')
+print(f"---------------------------------")
+for n in Intervals:
+    simp = Simpson(n)
+    print(f'Результат вычисления методом симпсона равен {simp} при n = {n}')
+    print(f'Абсолютная погрешность при n = {n} для метода средних прямоугольников: {abs(simp - AnalyticValue)}')
+    print(f'Относительная погрешность при n = {n} для метода средних прямоугольников: {(abs(simp - AnalyticValue) / AnalyticValue) * 100}%') 
+print(f"\n")
+
+n1 = 1
+error = 100
+while error >= 0.5:
+  Value = MiddlePoint(n1)
+  error = (abs(Value - AnalyticValue) / AnalyticValue) * 100
+  if error >= 0.5:
+    n1 += 1
+print(f'Для метода средних прямоугольников с погрешностью не более 0.5% достаточно {n1} интервалов разбиения с погрешностью: {error}%')
+
+n2 = 1
+error = 100
+while error >= 0.5:
+  Value = Trapetions(n2)
+  error = (abs(Value - AnalyticValue) / AnalyticValue) * 100
+  if error >= 0.5:
+    n2 += 1
+print(f'Для метода трапеций с погрешностью не более 0.5% достаточно {n2} интервалов разбиения с погрешностью: {error}%')
+
+n3 = 2
+error = 100
+while error >= 0.5:
+  Value = Simpson(n3)
+  error = (abs(Value - AnalyticValue) / AnalyticValue) * 100
+  if error >= 0.5:
+    n3 += 2
+print(f'Для метода Симпсона с погрешностью не более 0.5% достаточно {n3} интервалов разбиения с погрешностью: {error}%')
+
+#Вывод: метод Симпсона оказался наиболее точным, что доказал расчёт относительных погрешностей
